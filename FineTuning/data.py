@@ -7,9 +7,8 @@ import torch
 
 # define Data class from Dataset
 class Data(Dataset):
-    def __init__(self, path, label):
+    def __init__(self, path):
         self.path = path
-        self.label = label
         self.featext = Wav2Vec2FeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53", sampling_rate=16000)
     
     def __getitem__(self, index):
@@ -21,10 +20,10 @@ class Data(Dataset):
             audio_input_ = torch.Tensor(np.array(list(audio_input) + [0]*(16000*3-len(audio_input))))
         else:
             audio_input_ = audio_input[:16000*3]
-        return audio_input_, self.label[index]
+        return audio_input_, path
 
     def __len__(self):
-        return len(self.label)
+        return len(self.path)
 
 
 

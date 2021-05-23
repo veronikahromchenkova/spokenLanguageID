@@ -16,37 +16,24 @@ def test(data_path, model_path):
         1: "en",
         2: "ru",
     }
-    langs_true = {
-        0: "en",
-        1: "lv",
-        2: "ru",
-    }
     dataset = []
-    label = []
     batch = 1
-    class_path = os.listdir(data_path)
-    for ind, i in enumerate(class_path):
-        temp_path = []
-        temp_label = []
-        for j in os.listdir(os.path.join(data_path, i)):
-            if j.endswith(".wav"):
-                temp_path.append(os.path.join(data_path, i, j))
-                label.append(ind)
-        dataset.extend(temp_path)
-        label.extend(temp_label)
-    data = Data(dataset, label)
+    temp_path = []
+    for j in os.listdir(data_path):
+        if j.endswith(".wav"):
+            temp_path.append(os.path.join(data_path, j))
+    dataset.extend(temp_path)
+    data = Data(dataset)
     data = DataLoader(data, batch_size=batch, shuffle=True)
     model = torch.load(model_path, map_location=torch.device('cpu'))
     model.eval()
     with torch.no_grad():
-        for _input, label in data:
+        for _input, path in data:
             _input = _input.float()
             output = model(_input)
-            label = label.squeeze()
             pre = np.array(output.cpu().detach().numpy()).argmax(1)
             predicted_lang = langs_prediction[pre[0]]
-            true_lang = langs_true[int(label)]
-            print(predicted_lang, true_lang)
+            print(path, predicted_lang)
 
 
 # test
